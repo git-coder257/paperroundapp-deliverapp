@@ -11,6 +11,7 @@ export default function App() {
   let [postofficename, setpostofficename] = useState("")
   let [potentialpostoffices, setpotentialpostoffices] = useState([])
   let [error, seterror] = useState("")
+  let [yourpapers, setyourpapers] = useState([])
 
   const handleconfirmcreateaccount = async () => {
     if (postofficename === ""){
@@ -23,6 +24,7 @@ export default function App() {
       await axios.post(`https://dry-shore-19751.herokuapp.com/${username}/${password}/${postofficename}`)
         .then((r) => {
           if (r.data.success){
+            setyourpapers([{papername: "times", location: "6 Parr Close", "latitude":51.89067840576172,"longitude":-2.190200090408325}])
             setcurrentpage("home")
           } else if (!r.data.success){
             seterror("There has been an error please try again.")
@@ -64,7 +66,7 @@ export default function App() {
   const home = (
     <View style={styles.container}>
       <Text>
-        hello world
+        {yourpapers.map((paper, index) => )}
       </Text>
     </View>
   )
