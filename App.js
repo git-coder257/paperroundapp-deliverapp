@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Text, View, StyleSheet, TextInput, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
-// import axios from "axios"
+import axios from "axios"
 
 export default function App() {
 
@@ -20,14 +20,14 @@ export default function App() {
           setpotentialpostoffices(r.data.postoffices)
         })
     } else if (postofficename !== ""){
-      // await axios.post(`https://dry-shore-19751.herokuapp.com/${username}/${password}/${postofficename}`)
-      //   .then((r) => {
-      //     if (r.data.success){
-      //       setcurrentpage("home")
-      //     } else if (!r.data.success){
-      //       seterror("There has been an error please try again.")
-      //     }
-      //   })
+      await axios.post(`https://dry-shore-19751.herokuapp.com/${username}/${password}/${postofficename}`)
+        .then((r) => {
+          if (r.data.success){
+            setcurrentpage("home")
+          } else if (!r.data.success){
+            seterror("There has been an error please try again.")
+          }
+        })
     }
   }
 
@@ -36,7 +36,17 @@ export default function App() {
   }
 
   const handleconfirmlogin = () => {
-    setcurrentpage("home")
+    axios.get(`https://dry-shore-19751.herokuapp.com/ordereruser/${username}/${password}`)
+      .then((r) => {
+        console.log(r.data)
+        if (r.data.success){
+          if (r.data.accountexists){
+            setcurrentpage("home")
+          }
+        } else if (!r.data.success){
+          seterror("There has been an error please try again.")
+        }
+      })
   }
 
   const handlegotocreateaccountpage = () => {
@@ -45,6 +55,10 @@ export default function App() {
 
   const handlegotologinoptions = () => {
     setcurrentpage("loginoptions")
+  }
+
+  const handlegotologinpage = () => {
+    setcurrentpage("login")
   }
 
   const home = (
@@ -56,13 +70,19 @@ export default function App() {
   )
 
   const loginpage = (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
+        <TouchableOpacity onPress={handlegotologinoptions} style={styles.stylesforbackbutton}>
+          <Text>
+            Back
+          </Text>
+        </TouchableOpacity>
         <TextInput style={styles.usernameInput} placeholder="username" onChangeText={setusername}/>
         <TextInput style={styles.passwordInput} placeholder="password" onChangeText={setpassword}/>
+        <Text style={{fontSize: 8.5}}>{error}</Text>
         <TouchableOpacity style={styles.confirmuser} onPress={handleconfirmlogin} color="#fff">
           <Text>confirm</Text>
         </TouchableOpacity>
-    </View>
+    </ScrollView>
   )
 
   const createaccount = (
@@ -93,6 +113,9 @@ export default function App() {
     <SafeAreaView style={styles.container}>
       <TouchableOpacity style={styles.confirmloginoption} onPress={handlegotocreateaccountpage} color="#fff">
         <Text>create account</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.confirmloginoption} onPress={handlegotologinpage} color="fff">
+        <Text>login</Text>
       </TouchableOpacity>
     </SafeAreaView>
   )
