@@ -1,6 +1,15 @@
-import React, { useState } from 'react';
-import { Text, View, StyleSheet, TextInput, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
-// import axios from "axios"
+import React, { useState, useEffect } from 'react';
+import { Text, View, StyleSheet, TextInput, TouchableOpacity, ScrollView, SafeAreaView, Alert } from 'react-native';
+import axios from "axios"
+import { DataTable } from 'react-native-paper';
+
+const handlegetallpaperstodeliver = async (userid) => {
+  let response = await (await axios.get(`https://dry-shore-19751.herokuapp.com/getallpaperstodeliver/${userid}`)).data
+
+  console.log(response.papers)
+
+  return response.papers
+}
 
 export default function App() {
 
@@ -11,6 +20,21 @@ export default function App() {
   let [postofficename, setpostofficename] = useState("")
   let [potentialpostoffices, setpotentialpostoffices] = useState([])
   let [error, seterror] = useState("")
+  let [userid, setuserid] = useState(0)
+  let [papers, setpapers] = useState([])
+
+  useEffect(() => {
+
+    (async function () {
+      if (userid !== 0){
+        let papersvar = await handlegetallpaperstodeliver(userid)
+
+        console.log(userid)
+        console.log(papersvar)
+        setpapers(papersvar)
+      }
+    })()
+  }, [currentpage, userid])
 
   const handleconfirmcreateaccount = async () => {
     if (postofficename === ""){
@@ -20,14 +44,14 @@ export default function App() {
           setpotentialpostoffices(r.data.postoffices)
         })
     } else if (postofficename !== ""){
-      // await axios.post(`https://dry-shore-19751.herokuapp.com/${username}/${password}/${postofficename}`)
-      //   .then((r) => {
-      //     if (r.data.success){
-      //       setcurrentpage("home")
-      //     } else if (!r.data.success){
-      //       seterror("There has been an error please try again.")
-      //     }
-      //   })
+      await axios.post(`https://dry-shore-19751.herokuapp.com/newdeliveruser/${username}/${password}/${postofficename}`)
+        .then((r) => {
+          if (r.data.success){
+            setcurrentpage("home")
+          } else if (!r.data.success){
+            seterror("There has been an error please try again.")
+          }
+        })
     }
   }
 
@@ -35,8 +59,23 @@ export default function App() {
     setpostofficename(name)
   }
 
-  const handleconfirmlogin = () => {
-    setcurrentpage("home")
+  const handleconfirmlogin = async () => {
+    let response = await (await axios.get(`https://dry-shore-19751.herokuapp.com/deliveruser/${username}/${password}`)).data
+
+    console.log(response)
+
+    if (response.success){
+      if (response.accountexists){
+        setcurrentpage("home")
+        console.log(response.userid)
+        setuserid(response.userid)
+      }
+    } else if (!response.success){
+      if (!response.accountexists){
+        console.log("Hello")
+        Alert.alert("You entered the wrong info.")
+      }
+    }
   }
 
   const handlegotocreateaccountpage = () => {
@@ -47,22 +86,37 @@ export default function App() {
     setcurrentpage("loginoptions")
   }
 
+  const handlegotologinpage = () => {
+    setcurrentpage("login")
+  }
+
   const home = (
-    <View style={styles.container}>
-      <Text>
-        hello world
-      </Text>
+    <View style={styles.containerforhomepage}>
+      <DataTable>
+        <DataTable.Header>
+          <DataTable.Title>Name</DataTable.Title>
+          <DataTable.Title>Locations</DataTable.Title>
+        </DataTable.Header>
+        {papers.map((paper, index) => <DataTable.Header>
+          <DataTable.Cell>
+            {paper.papername}
+          </DataTable.Cell>
+          <DataTable.Cell>
+            {paper.location}
+          </DataTable.Cell>
+        </DataTable.Header>)}
+      </DataTable>
     </View>
   )
 
   const loginpage = (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
         <TextInput style={styles.usernameInput} placeholder="username" onChangeText={setusername}/>
         <TextInput style={styles.passwordInput} placeholder="password" onChangeText={setpassword}/>
         <TouchableOpacity style={styles.confirmuser} onPress={handleconfirmlogin} color="#fff">
           <Text>confirm</Text>
         </TouchableOpacity>
-    </View>
+    </ScrollView>
   )
 
   const createaccount = (
@@ -94,6 +148,9 @@ export default function App() {
       <TouchableOpacity style={styles.confirmloginoption} onPress={handlegotocreateaccountpage} color="#fff">
         <Text>create account</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={styles.confirmloginoption} onPress={handlegotologinpage} color="#fff">
+        <Text>login</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   )
 
@@ -101,6 +158,12 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+  containerforhomepage: {
+
+  },
+  titleforhomepage: {
+    fontSize: 25
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
