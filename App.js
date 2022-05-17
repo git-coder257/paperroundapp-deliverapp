@@ -111,14 +111,19 @@ export default function App() {
 
   const loginpage = (
     <ScrollView style={styles.container}>
-        <TextInput style={styles.usernameInput} placeholder="username" onChangeText={setusername}/>
-        <TextInput style={styles.passwordInput} placeholder="password" onChangeText={setpassword}/>
-        <TouchableOpacity style={styles.confirmuser} onPress={handleconfirmlogin} color="#fff">
-          <Text>confirm</Text>
-        </TouchableOpacity>
+      <TouchableOpacity onPress={handlegotologinoptions} style={styles.stylesforbackbutton}>
+        <Text>
+          Back
+        </Text>
+      </TouchableOpacity>
+      <TextInput style={styles.usernameInput} placeholder="username" onChangeText={setusername}/>
+      <TextInput style={styles.passwordInput} placeholder="password" onChangeText={setpassword}/>
+      <TouchableOpacity style={styles.confirmuser} onPress={handleconfirmlogin} color="#fff">
+        <Text>confirm</Text>
+      </TouchableOpacity>
     </ScrollView>
   )
-
+  
   const createaccount = (
       <ScrollView style={styles.container}>
         <TouchableOpacity onPress={handlegotologinoptions} style={styles.stylesforbackbutton}>
