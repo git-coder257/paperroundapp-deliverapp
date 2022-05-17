@@ -19,7 +19,6 @@ export default function App() {
   let [district, setdistrict] = useState("")
   let [postofficename, setpostofficename] = useState("")
   let [potentialpostoffices, setpotentialpostoffices] = useState([])
-  let [error, seterror] = useState("")
   let [userid, setuserid] = useState(0)
   let [papers, setpapers] = useState([])
 
@@ -49,7 +48,7 @@ export default function App() {
           if (r.data.success){
             setcurrentpage("home")
           } else if (!r.data.success){
-            seterror("There has been an error please try again.")
+            Alert.alert("There has been an error please try again.")
           }
         })
     }
