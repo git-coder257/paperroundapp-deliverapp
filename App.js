@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, TextInput, TouchableOpacity, ScrollView, SafeAreaView, Alert } from 'react-native';
+import { Text, View, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, Alert, ScrollView } from 'react-native';
 import axios from "axios"
 import { DataTable } from 'react-native-paper';
 
@@ -90,14 +90,23 @@ export default function App() {
     setcurrentpage("login")
   }
 
+  const handlerefresh = async () => {
+    setpapers(await handlegetallpaperstodeliver(userid))
+  }
+
   const home = (
-    <View style={styles.containerforhomepage}>
+    <ScrollView style={{paddingTop: 17.5}}>
+      <TouchableOpacity onPress={handlerefresh} style={{paddingLeft: 7}}>
+        <Text>
+          refresh
+        </Text>
+      </TouchableOpacity>
       <DataTable>
         <DataTable.Header>
           <DataTable.Title>Name</DataTable.Title>
           <DataTable.Title>Locations</DataTable.Title>
         </DataTable.Header>
-        {papers.map((paper, index) => <DataTable.Header>
+        {papers.map((paper, index) => <DataTable.Header key={index}>
           <DataTable.Cell>
             {paper.papername}
           </DataTable.Cell>
@@ -106,11 +115,12 @@ export default function App() {
           </DataTable.Cell>
         </DataTable.Header>)}
       </DataTable>
-    </View>
+    </ScrollView>
   )
 
   const loginpage = (
-    <ScrollView style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <View>
       <TouchableOpacity onPress={handlegotologinoptions} style={styles.stylesforbackbutton}>
         <Text>
           Back
@@ -121,11 +131,12 @@ export default function App() {
       <TouchableOpacity style={styles.confirmuser} onPress={handleconfirmlogin} color="#fff">
         <Text>confirm</Text>
       </TouchableOpacity>
-    </ScrollView>
+      </View>
+    </SafeAreaView>
   )
-  
+
   const createaccount = (
-      <ScrollView style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <TouchableOpacity onPress={handlegotologinoptions} style={styles.stylesforbackbutton}>
           <Text>
             Back
@@ -137,7 +148,7 @@ export default function App() {
         {potentialpostoffices.length > 0 && <Text style={{fontSize: 16.5}}>
           Select your post office
         </Text>}
-        {potentialpostoffices.map((postoffice, index) => <TouchableOpacity onPress={() => handleupdatepostofficename(postoffice.postofficename)}>
+        {potentialpostoffices.map((postoffice, index) => <TouchableOpacity key={index} onPress={() => handleupdatepostofficename(postoffice.postofficename)}>
           <Text style={styles.textstyle} key={index}>
             {postoffice.postofficename}
           </Text>
@@ -145,7 +156,7 @@ export default function App() {
         <TouchableOpacity style={styles.confirmuser} onPress={handleconfirmcreateaccount} color="#fff">
           <Text>confirm</Text>
         </TouchableOpacity>
-      </ScrollView>
+      </SafeAreaView>
   )
 
   const loginoptions = (
@@ -163,9 +174,6 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  containerforhomepage: {
-
-  },
   titleforhomepage: {
     fontSize: 25
   },
@@ -211,9 +219,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginTop: 8,
     borderColor: "#0d6efd",
-    // textAlign: 'center'
-    flex: 1,
-    alignItems: 'center'
+    display: 'flex',
+    alignItems: 'center',
   },
   confirmloginoption: {
     backgroundColor: "#0d6efd",
